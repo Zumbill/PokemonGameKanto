@@ -162,6 +162,15 @@
         background: var(--accent-dark);
       }
 
+      .reset-button {
+        margin-top: 14px;
+        background: var(--green);
+      }
+
+      .reset-button:hover {
+        background: #1d6042;
+      }
+
       button:disabled {
         cursor: wait;
         opacity: 0.7;
@@ -252,12 +261,32 @@
         gap: 12px;
       }
 
+      .attempt-pokemon {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .attempt-image {
+        width: 44px;
+        aspect-ratio: 1;
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        object-fit: contain;
+      }
+
       .attempt-name {
+        min-width: 0;
         font-weight: 900;
         text-transform: capitalize;
+        overflow-wrap: anywhere;
       }
 
       .attempt-id {
+        flex: 0 0 auto;
         color: var(--muted);
         font-weight: 800;
       }
@@ -386,6 +415,9 @@
             <div>
               <strong id="win-name"></strong>
               <span id="win-text"></span>
+              <button id="reset-button" class="reset-button" type="button">
+                Jogar novamente
+              </button>
             </div>
           </div>
         </div>
@@ -410,6 +442,7 @@
         winImage: document.querySelector("#win-image"),
         winName: document.querySelector("#win-name"),
         winText: document.querySelector("#win-text"),
+        resetButton: document.querySelector("#reset-button"),
       };
 
       // Ativa ou desativa os campos enquanto uma requisicao esta acontecendo.
@@ -435,13 +468,34 @@
 
       // Pede ao servidor para iniciar uma nova rodada do jogo.
       async function iniciarJogo() {
+        setLoading(true);
+
         try {
           const data = await requestJson("/api/game/start", { method: "POST" });
           elements.status.textContent = data.mensagem;
           elements.input.focus();
         } catch (error) {
           elements.status.textContent = error.message;
+        } finally {
+          setLoading(false);
         }
+      }
+
+      // Limpa a tela e prepara a interface para uma nova rodada.
+      async function resetarJogo() {
+        elements.resetButton.disabled = true;
+        elements.win.classList.remove("show");
+        elements.mystery.classList.remove("hide");
+        elements.history.innerHTML =
+          '<p class="empty">Suas dicas vao aparecer aqui depois do primeiro chute.</p>';
+        elements.input.value = "";
+        elements.winImage.src = "";
+        elements.winImage.alt = "";
+        elements.winName.textContent = "";
+        elements.winText.textContent = "";
+        setLoading(false);
+        await iniciarJogo();
+        elements.resetButton.disabled = false;
       }
 
       // Monta o HTML de uma tentativa errada com dados do chute e dicas.
@@ -454,6 +508,14 @@
 
         const titulo = document.createElement("div");
         titulo.className = "attempt-title";
+
+        const pokemonInfo = document.createElement("div");
+        pokemonInfo.className = "attempt-pokemon";
+
+        const imagem = document.createElement("img");
+        imagem.className = "attempt-image";
+        imagem.src = data.chute.imagem;
+        imagem.alt = data.chute.nome;
 
         const nome = document.createElement("span");
         nome.className = "attempt-name";
@@ -496,7 +558,8 @@
           dicas.append(dica);
         }
 
-        titulo.append(nome, id);
+        pokemonInfo.append(imagem, nome);
+        titulo.append(pokemonInfo, id);
         header.append(titulo, fatos);
         tentativa.append(header, dicas);
         return tentativa;
@@ -553,6 +616,7 @@
       }
 
       elements.form.addEventListener("submit", enviarChute);
+      elements.resetButton.addEventListener("click", resetarJogo);
       iniciarJogo();
     </script>
   </body>
