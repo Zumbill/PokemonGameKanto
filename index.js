@@ -142,6 +142,7 @@ async function avaliarTentativa(nome) {
       tipos: chute.tipos,
       altura: chute.altura,
       peso: chute.peso,
+      imagem: chute.imagem,
     },
     dicas: [
       compararNumero(chute.id, pokemonSecreto.id, "ID"),
