@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const PORT = process.env.PORT || 3000;
-const HOST = "127.0.0.1";
+const HOST = process.env.HOST || "0.0.0.0";
 const KANTO_FIRST_ID = 1;
 const KANTO_LAST_ID = 151;
 let pokemonSecreto = null;
