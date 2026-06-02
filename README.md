@@ -1,4 +1,4 @@
-# Daily Pokemon Game
+# Pokemon Game
 
 Um jogo simples feito com Node.js, HTML, CSS e JavaScript. O objetivo é adivinhar qual é o Pokemon secreto da região de Kanto usando dicas de número da Pokedex, altura, peso e tipo.
 
